@@ -2,7 +2,7 @@
 
 namespace Doctrine\Composer;
 
-use Doctrine\Composer\Common\AbstractPluginHook;
+use Doctrine\Composer\PluginHook\Common\AbstractPluginHook;
 use Composer\Autoload\ClassMapGenerator;
 use Composer\Composer;
 use Composer\EventDispatcher\EventSubscriberInterface;
