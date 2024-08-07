@@ -1,6 +1,6 @@
 <?php
 
-namespace Doctrince\Composer;
+namespace Doctrine\Composer;
 
 use Composer\Installer\PackageEvent;
 

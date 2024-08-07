@@ -7,7 +7,7 @@ use Composer\Installer\PackageEvent;
 /**
  *
  */
-final class SQLiteSchemaManager extends Common\AbstractPluginHook
+final class PostgreSQLSchemaManager extends Common\AbstractPluginHook
 {
     public function getPackageName(): string
     {
@@ -18,7 +18,7 @@ final class SQLiteSchemaManager extends Common\AbstractPluginHook
     {
         $block = '$type = $this->extractDoctrineTypeFromComment($tableColumn[\'comment\'] ?? null, $type);';
 
-        file_append_block('$type = $this->platform->getDoctrineTypeMapping($dbType);', $block, $this->getBundleDir() . '/src/Schema/SQLiteSchemaManager.php');
-        $this->Print('Updated "SQLiteSchemaManager.php" file.');
+        file_append_block('$type = $this->platform->getDoctrineTypeMapping($dbType);', $block, $this->getBundleDir() . '/src/Schema/PostgreSQLSchemaManager.php');
+        $this->Print('Updated "PostgreSQLSchemaManager.php" file.');
     }
 }
