@@ -133,4 +133,39 @@ final class Plugin implements PluginInterface, EventSubscriberInterface
             $class->onPackageUpdate($event);
         }
     }
+
+    private array $removedPackageNames = [];
+
+    public function onPackageRemove(PackageEvent $event)
+    {
+        $operation = $event->getOperation();
+        $packageName = $operation->getInitialPackage()?->getName();
+        if (in_array($packageName, $this->removedPackageNames)) {
+            return;
+        }
+
+        $this->removedPackageNames[] = $packageName;
+
+        foreach (ClassMapGenerator::createMap(__DIR__) as $className => $_) {
+
+            if (!in_array(PluginHookInterface::class, class_implements($className))) {
+                continue;
+            }
+
+            try {
+                $class = new $className();
+            } catch (\Error $e) {
+                continue;
+            }
+
+            if (!InstalledVersions::isInstalled($class->getPackageName())) {
+                continue;
+            }
+            if ($class->getPackageName() != $packageName && $this->getPackageName() != $packageName) {
+                continue;
+            }
+
+            $class->onPackageRemove($event);
+        }
+    }
 }
