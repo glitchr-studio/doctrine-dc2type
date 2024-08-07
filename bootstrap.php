@@ -9,19 +9,19 @@ if (!function_exists('file_replace')) {
         
         foreach ($fname as $f) {
             if (!file_exists($f)) {
-                echo "File '$f' does not exist.\n";
+                echo "      File '$f' does not exist.\n";
                 continue;
             }
 
             $fileContents = file_get_contents($f);
             if ($fileContents === false) {
-                echo "Could not read the file '$f'.\n";
+                echo "      Could not read the file '$f'.\n";
                 continue;
             }
 
             $newContents = str_replace($search, $replace, $fileContents, $replaceCount);
             if (file_put_contents($f, $newContents, LOCK_EX) === false) {
-                echo "Could not write to the file '$f'.\n";
+                echo "      Could not write to the file '$f'.\n";
             } else {
                 $count += $replaceCount;
             }
@@ -38,13 +38,13 @@ if (!function_exists('file_remove_line')) {
 
         foreach ($fname as $f) {
             if (!file_exists($f)) {
-                echo "File '$f' does not exist.\n";
+                echo "      File '$f' does not exist.\n";
                 continue;
             }
 
             $fileContents = file($f, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);
             if ($fileContents === false) {
-                echo "Could not read the file '$f'.\n";
+                echo "      Could not read the file '$f'.\n";
                 continue;
             }
 
@@ -53,7 +53,7 @@ if (!function_exists('file_remove_line')) {
             });
 
             if (file_put_contents($f, implode(PHP_EOL, $newContents) . PHP_EOL, LOCK_EX) === false) {
-                echo "Could not write to the file '$f'.\n";
+                echo "      Could not write to the file '$f'.\n";
             }
         }
     }
@@ -68,14 +68,14 @@ if (!function_exists('file_prepend')) {
 
         foreach ($fname as $f) {
             if (!file_exists($f)) {
-                echo "File '$f' does not exist.\n";
+                echo "      File '$f' does not exist.\n";
                 continue;
             }
 
             // Read existing file contents
             $fileContents = file_get_contents($f);
             if ($fileContents === false) {
-                echo "Could not read the file '$f'.\n";
+                echo "      Could not read the file '$f'.\n";
                 continue;
             }
 
@@ -98,9 +98,9 @@ if (!function_exists('file_prepend')) {
 
             // Write the updated content to the file
             if (file_put_contents($f, implode(PHP_EOL, $newContents) . PHP_EOL, LOCK_EX) === false) {
-                echo "Could not write to the file '$f'.\n";
+                echo "      Could not write to the file '$f'.\n";
             } else if (!$found) {
-                echo "No matching line found in '$f'.\n";
+                echo "      No matching line found in '$f'.\n";
             }
         }
     }
@@ -115,14 +115,14 @@ if (!function_exists('file_append_block')) {
 
         foreach ($fname as $f) {
             if (!file_exists($f)) {
-                echo "File '$f' does not exist.\n";
+                echo "      File '$f' does not exist.\n";
                 continue;
             }
 
             // Read and preprocess the file content
             $fileContents = file_get_contents($f);
             if ($fileContents === false) {
-                echo "Could not read the file '$f'.\n";
+                echo "      Could not read the file '$f'.\n";
                 continue;
             }
 
@@ -145,9 +145,9 @@ if (!function_exists('file_append_block')) {
 
             // Write modified content to file
             if ($found && file_put_contents($f, implode(PHP_EOL, $newContents) . PHP_EOL, LOCK_EX) === false) {
-                echo "Could not write to the file '$f'.\n";
+                echo "      Could not write to the file '$f'.\n";
             } elseif (!$found) {
-                echo "No matching line found in '$f'.\n";
+                echo "      No matching line found in '$f'.\n";
             }
         }
     }
@@ -162,14 +162,14 @@ if (!function_exists('file_append_method')) {
 
         foreach ($fname as $f) {
             if (!file_exists($f)) {
-                echo "File '$f' does not exist.\n";
+                echo "      File '$f' does not exist.\n";
                 continue;
             }
 
             // Read existing file contents
             $fileContents = file_get_contents($f);
             if ($fileContents === false) {
-                echo "Could not read the file '$f'.\n";
+                echo "      Could not read the file '$f'.\n";
                 continue;
             }
 
@@ -205,7 +205,7 @@ if (!function_exists('file_append_method')) {
 
             // Write the updated content to the file
             if (file_put_contents($f, implode(PHP_EOL, $newContents) . PHP_EOL, LOCK_EX) === false) {
-                echo "Could not write to the file '$f'.\n";
+                echo "      Could not write to the file '$f'.\n";
             }
         }
     }
