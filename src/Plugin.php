@@ -139,7 +139,7 @@ final class Plugin implements PluginInterface, EventSubscriberInterface
     public function onPackageRemove(PackageEvent $event)
     {
         $operation = $event->getOperation();
-        $packageName = $operation->getInitialPackage()?->getName();
+        $packageName = $operation->getPackage()?->getName();
         if (in_array($packageName, $this->removedPackageNames)) {
             return;
         }
