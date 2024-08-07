@@ -25,7 +25,10 @@ abstract class AbstractPluginHook implements PluginHookInterface
      */
     public function onPackageChange(PackageEvent $event)
     {
-        throw new \UnexpectedValueException('Please override ' . static::class . '::' . __METHOD__);
+        $methodName = explode("::", __METHOD__);
+        $methodName = last($methodName);
+        throw new \UnexpectedValueException('Please override ' . static::class . '::' . $methodName);
+
     }
 
     /**
