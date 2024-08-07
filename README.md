@@ -1,4 +1,4 @@
-# Base Plugin
+# Doctrine DC2Type Plugin
 
 
 
