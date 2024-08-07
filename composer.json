@@ -1,8 +1,8 @@
 {
-  "name": "glitchr/base-plugin",
+  "name": "glitchr/doctrine-dc2type",
   "type": "composer-plugin",
-  "description": "Base plugin integration for Symfony",
-  "keywords": ["symfony", "base", "helper", "plugin"],
+  "description": "Plugin re-enabling DC2Type comments in Doctrine DBAL",
+  "keywords": ["symfony", "doctrine" "dc2type"],
   "homepage": "https://gitlab.glitchr.dev/public-repository/symfony",
   "license": "LGPL-3.0-or-later",
   "authors": [
@@ -13,9 +13,7 @@
   ],
   "require": {
     "php": "^8.0",
-    "composer-plugin-api": "^2.0",
-    "easycorp/easyadmin-bundle": "*",
-    "league/flysystem-bundle": "*"
+    "composer-plugin-api": "^2.0"
   },
   "require-dev": {
     "composer/composer": "^2.0"
@@ -31,6 +29,6 @@
     "sort-packages": true
   },
   "extra": {
-    "class": "Base\\Composer\\Plugin"
+    "class": "Doctrine\\Composer\\Plugin"
   }
 }
