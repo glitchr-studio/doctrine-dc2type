@@ -14,7 +14,7 @@ final class OracleSchemaManager extends Common\AbstractPluginHook
         return 'doctrine/dbal';
     }
 
-    public function onPackageEvent(PackageEvent $event)
+    public function onPackageChange(PackageEvent $event)
     {
         $block = '$type = $this->extractDoctrineTypeFromComment($tableColumn[\'comment\'] ?? null, $type);';
 
