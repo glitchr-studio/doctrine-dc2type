@@ -18,7 +18,7 @@ final class PostgreSQLSchemaManager extends Common\AbstractPluginHook
     {
         $block = '$type = $this->extractDoctrineTypeFromComment($tableColumn[\'comment\'] ?? null, $type);';
 
+        $this->Print('Updating "PostgreSQLSchemaManager.php" file.');
         file_append_block('$type = $this->platform->getDoctrineTypeMapping($dbType);', $block, $this->getBundleDir() . '/src/Schema/PostgreSQLSchemaManager.php');
-        $this->Print('Updated "PostgreSQLSchemaManager.php" file.');
     }
 }

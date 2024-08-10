@@ -18,7 +18,7 @@ final class MySQLSchemaManager extends Common\AbstractPluginHook
     {
         $block = '$type = $this->extractDoctrineTypeFromComment($tableColumn[\'comment\'] ?? null, $type);';
 
+        $this->Print('Updating "MySQLSchemaManager.php" file.');
         file_append_block('$type = $this->platform->getDoctrineTypeMapping($dbType);', $block, $this->getBundleDir() . '/src/Schema/MySQLSchemaManager.php');
-        $this->Print('Updated "MySQLSchemaManager.php" file.');
     }
 }

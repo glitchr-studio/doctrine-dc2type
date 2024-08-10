@@ -32,7 +32,7 @@ public function extractDoctrineTypeFromComment(?string $comment, string $current
     return $currentType;
 }';
 
+        $this->Print('Updating "AbstractSchemaManager.php" file.');
         file_append_method("listTableIndexes", $block, $this->getBundleDir() . '/src/Schema/AbstractSchemaManager.php');
-        $this->Print('Updated "AbstractSchemaManager.php" file.');
     }
 }

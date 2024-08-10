@@ -18,7 +18,7 @@ final class OracleSchemaManager extends Common\AbstractPluginHook
     {
         $block = '$type = $this->extractDoctrineTypeFromComment($tableColumn[\'comment\'] ?? null, $type);';
 
+        $this->Print('Updating "OracleSchemaManager.php" file.');
         file_append_block('$type = $this->platform->getDoctrineTypeMapping($dbType);', $block, $this->getBundleDir() . '/src/Schema/OracleSchemaManager.php');
-        $this->Print('Updated "OracleSchemaManager.php" file.');
     }
 }
