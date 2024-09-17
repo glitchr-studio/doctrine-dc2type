@@ -1,8 +1,8 @@
 <?php
 
 namespace Doctrine\Composer;
-
 use Doctrine\Composer\PluginHook\Common\AbstractPluginHook;
+
 use Composer\Autoload\ClassMapGenerator;
 use Composer\Composer;
 use Composer\EventDispatcher\EventSubscriberInterface;
@@ -24,7 +24,7 @@ final class Plugin implements PluginInterface, EventSubscriberInterface
      */
     public static function getPackageName()
     {
-        return 'glitchr/doctrine-dc2type';
+        return basename(dirname(__FILE__, 3))."/".basename(dirname(__FILE__, 2));
     }
 
     /**
@@ -94,6 +94,9 @@ final class Plugin implements PluginInterface, EventSubscriberInterface
             if ($class->getPackageName() != $packageName && $this->getPackageName() != $packageName) {
                 continue;
             }
+            if (!$class->checkValidityVersion($event)) {
+                continue;
+            }
 
             $class->onPackageInstall($event);
         }
@@ -130,6 +133,10 @@ final class Plugin implements PluginInterface, EventSubscriberInterface
                 continue;
             }
 
+            if (!$class->checkValidityVersion($event)) {
+                continue;
+            }
+
             $class->onPackageUpdate($event);
         }
     }
@@ -162,6 +169,9 @@ final class Plugin implements PluginInterface, EventSubscriberInterface
                 continue;
             }
             if ($class->getPackageName() != $packageName && $this->getPackageName() != $packageName) {
+                continue;
+            }
+            if (!$class->checkValidityVersion($event)) {
                 continue;
             }
 

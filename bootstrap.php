@@ -7,7 +7,8 @@ if (!class_exists("CodeModifier")) {
         protected $filePath;
         protected $backupFilePath;
         protected $author;
-    
+        protected $output;
+
         protected $recursive;
         protected $tokens = null;
         protected $changes = [];
@@ -22,9 +23,11 @@ if (!class_exists("CodeModifier")) {
         const PREG_MODIFIER_END   = '/^\s*\/\/\s*\[bootstrap:([^\]]+)@([^\]]+)\]\s*##### End of modification/s';
         const PREG_MODIFIER_META  = '/^\s*\/\/\s*\[bootstrap:([^\]]+)@([^\]]+)\] (.*)/s';
     
-        public function __construct(string $filePath, $author = "unknown", $recursive = False) {
+        public function __construct(string $filePath, $author = "unknown", $recursive = False, $output = null) {
     
             $this->filePath = $filePath;
+            $this->output = $output ?? $filePath;
+
             $this->backupFilePath = $filePath . '.bak';
             $this->author = $author;
             $this->recursive = $recursive;
@@ -215,7 +218,7 @@ if (!class_exists("CodeModifier")) {
         }
     
         public function write() {
-            file_put_contents($this->filePath, $this->detokenize($this->tokens)); // Save changes back to the file
+            file_put_contents($this->output, $this->detokenize($this->tokens)); // Save changes back to the file
             $this->parse();  // Reparse after modification
         }
     
@@ -223,16 +226,11 @@ if (!class_exists("CodeModifier")) {
         public function print()
         {
             echo "List of changes operated to file: `".$this->filePath."`:<br/>";
-            dump($this->changes);
-    
             echo "List of tokens:<br/>";
-            $str = "";
             $padsize = 40;
             foreach ($this->tokens as $token) {
-                $str .= str_pad($token["id"]. ": ".$token["name"]." (". $token["tag"] . ")", $padsize). " \"" . htmlspecialchars(str_replace(PHP_EOL, PHP_EOL.str_pad("", $padsize+2), $token["content"])) . "\"".PHP_EOL;
+                echo str_pad($token["id"]. ": ".$token["name"]." (". $token["tag"] . ")", $padsize). " \"" . htmlspecialchars(str_replace(PHP_EOL, PHP_EOL.str_pad("", $padsize+2), $token["content"])) . "\"".PHP_EOL;
             }
-    
-            dump($str);
         }
     
         // Helper method to generate the modification block and save original lines
@@ -418,10 +416,10 @@ if (!class_exists("CodeModifier")) {
     
                     $offset = $this->offset($tokens, $nextToken);
                     $contents = $this->detokenize($tokens);
-                    
+
                     // Handle multiline search: allow flexible whitespaces between lines
                     $escapedSearch = preg_quote($searchItem, '/');
-                    $pattern = '/[^'.PHP_EOL.']*'. str_replace(PHP_EOL, '\s*' . PHP_EOL . '\s*', $escapedSearch) . '[^'.PHP_EOL.']*/s';
+                    $pattern = '/[^'.PHP_EOL.']*'. str_replace(PHP_EOL, '[ ]*' . PHP_EOL . '[ ]*', $escapedSearch) . '[^'.PHP_EOL.']*/s';
     
                     // Use preg_match_all to find all occurrences in cleaned content
                     if (!preg_match($pattern, $contents, $matches, PREG_OFFSET_CAPTURE, $offset)) {
@@ -438,12 +436,17 @@ if (!class_exists("CodeModifier")) {
                             $firstToken = $this->tell($tokens, $matchStart);
                             $lastToken  = $this->tell($tokens, $matchStart + $matchLength - 1);
                             $matchedBlock = $this->detokenize($this->tokens, $firstToken, $lastToken);
-                            
+                            $prefix = "";
+                            if (strpos($matchedBlock, PHP_EOL) === 0) {
+                                $matchedBlock = substr($matchedBlock, strlen(PHP_EOL));
+                                $prefix = PHP_EOL;
+                            }
+
                             $this->tokens[$firstToken] = [
                                 "id" => $this->tokens[$firstToken]["id"],
                                 "tag" => T_STRING,
                                 "name" => token_name(T_STRING), 
-                                "content" => $this->generator($tag, $searchItem, $matchedBlock, $fn, ...$args)
+                                "content" => $prefix.$this->generator($tag, $searchItem, $matchedBlock, $fn, ...$args)
                             ];
     
                             $keys = range($firstToken+1, $lastToken);
@@ -633,7 +636,29 @@ if (!class_exists("CodeModifier")) {
         {
             return count($this->tokens);
         }
-    
+
+        public static function read(array $tokens, string $offset)
+        {
+            $tellp = 0;  // This tracks the position in the token stream
+
+            foreach ($tokens as $token) {
+                $length = strlen($token["content"]);  // Get the length of the current token's content
+
+                // Check if the offset falls within the current token
+                if ($offset >= $tellp && $offset < $tellp + $length) {
+                    // Return the specific character at the given offset within this token
+                    $charPosition = $offset - $tellp;
+                    return $token["content"][$charPosition];
+                }
+
+                // Increment the position tracker by the length of the current token
+                $tellp += $length;
+            }
+
+            // Return null if the offset is out of bounds
+            return null;
+        }
+
         public static function tell(array $tokens, string $offset)
         {
             $tellp = 0;
