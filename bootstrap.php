@@ -567,6 +567,8 @@ if (!class_exists("CodeModifier")) {
                         break;
     
                     case T_CLASS:
+                    case T_ABSTRACT:
+                    case T_INTERFACE:
                         $context["class"] = 0;
                         $brackets["class"] = 0;
                         $tokens["class"] = [$tokenId];
