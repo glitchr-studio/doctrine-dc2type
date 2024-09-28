@@ -512,13 +512,14 @@ if (!class_exists("CodeModifier")) {
                 if($firstToken !== false) {
                 
                     $matchedBlock = $this->detokenize($this->tokens, $firstToken, $lastToken);
-    
+
                     $keys = range($firstToken+1, $lastToken);
                     foreach($keys as $key) {
     
                         if(array_key_exists($key, $this->tokens))
                             unset($this->tokens[$key]);
                     }
+
                     $this->tokens[$firstToken] = [
                         "id" => $this->tokens[$firstToken]["id"],
                         "tag" => T_STRING,
