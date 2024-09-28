@@ -17,10 +17,10 @@ final class PostgreSQLSchemaManager extends Common\AbstractPluginHook
     public function onPackageChange(PackageEvent $event)
     {
         $search = '$type = $this->platform->getDoctrineTypeMapping($dbType);';
-        $block = '$type = $this->extractDoctrineTypeFromComment($tableColumn[\'comment\'] ?? null, $type);';
+        $block  = '$type = $this->extractDoctrineTypeFromComment($tableColumn[\'comment\'] ?? null, $type);';
         
         $this->Print('Updating "PostgreSQLSchemaManager.php" file.');
         $codeModifier = new \CodeModifier($this->getBundleDir() . '/src/Schema/PostgreSQLSchemaManager.php', $this->getAuthor());
-        $codeModifier->replace("comment", $search, $search.$block);
+        $codeModifier->appendToLine("comment", $search, $block);
     }
 }

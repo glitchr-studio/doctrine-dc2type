@@ -82,6 +82,7 @@ abstract class AbstractPluginHook implements PluginHookInterface
 
     public function getPackageVersion(PackageEvent $event): string
     {
+	dump($event);
         return $event->getOperation()->getPackage()->getVersion();
     }
 

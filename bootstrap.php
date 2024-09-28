@@ -474,23 +474,32 @@ if (!class_exists("CodeModifier")) {
             return $found;
         }
     
-    
-        public function prependTo($tag, string|array $methods, string|array $block)
+        public function prependToLine($tag, string|array $search, string|array $block)
         {
-            return $this->callbackMethod($tag, $methods, 
+            return $this->replace($tag, $search, $block.PHP_EOL.$search);
+        }
+    
+        public function prependTo($tag, string|array $method, string|array $block)
+        {
+            return $this->callbackMethod($tag, $method, 
                 fn($key, $search, $subject, $block) => yield $block.PHP_EOL.$subject,
                 is_array($block)  ? $block  : [$block]
             );
         }
     
-        public function appendTo($tag, string|array $methods, string|array $block)
+        public function appendToLine($tag, string|array $search, string|array $block)
         {
-            return $this->callbackMethod($tag, $methods, 
+            return $this->replace($tag, $search, $search.PHP_EOL.$block);
+        }
+
+        public function appendTo($tag, string|array $method, string|array $block)
+        {
+            return $this->callbackMethod($tag, $method, 
                 fn($key, $search, $subject, $block) => yield $subject.PHP_EOL.$block,
                 is_array($block)  ? $block  : [$block]
             );
         }
-    
+
         private function callbackMethod($tag, string|array $methods, callable $fn, string|array $block)
         {
             $found = 0;
