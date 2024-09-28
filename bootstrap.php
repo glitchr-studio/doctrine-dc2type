@@ -554,7 +554,7 @@ if (!class_exists("CodeModifier")) {
                 $label = ($context["namespace"] === null ? "" : $context["namespace"]) . "\\" .
                          ($context["class"] === null ? "" : $context["class"]."::") .
                          ($context["method"] === null ? "" : $context["method"]);
-                
+
                 if(!str_starts_with($label, "\\"))
                     $label = "\\".$label;
     
@@ -580,6 +580,7 @@ if (!class_exists("CodeModifier")) {
                         $tokens["method"] = [$tokenId];
                         break;
                 
+                    case T_NAME_QUALIFIED:
                     case T_STRING:
                         foreach($context as $key => $_) {
                             if($context[$key] === 0) {
@@ -603,8 +604,9 @@ if (!class_exists("CodeModifier")) {
                                     if($brackets[$ctx] == 0) {
     
                                         $tokens[$ctx][] = $tokenId;
-                                        if($label == $search) 
+                                        if($label == $search) {
                                             return $tokens[$ctx];
+                                        }
     
                                         unset($brackets[$ctx]);
                                         $context[$ctx] = null;
