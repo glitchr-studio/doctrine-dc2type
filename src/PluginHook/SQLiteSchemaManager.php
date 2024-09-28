@@ -16,9 +16,11 @@ final class SQLiteSchemaManager extends Common\AbstractPluginHook
 
     public function onPackageChange(PackageEvent $event)
     {
+        $search = '$type = $this->platform->getDoctrineTypeMapping($dbType);';
         $block = '$type = $this->extractDoctrineTypeFromComment($tableColumn[\'comment\'] ?? null, $type);';
-
+        
         $this->Print('Updating "SQLiteSchemaManager.php" file.');
-        file_append_block('$type = $this->platform->getDoctrineTypeMapping($dbType);', $block, $this->getBundleDir() . '/src/Schema/SQLiteSchemaManager.php');
+        $codeModifier = new \CodeModifier($this->getBundleDir() . '/src/Schema/SQLiteSchemaManager.php', $this->getAuthor());
+        $codeModifier->replace("comment", $search, $search.$block);
     }
 }
