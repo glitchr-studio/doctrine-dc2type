@@ -7,6 +7,7 @@ use Composer\Factory;
 use Composer\Installer\PackageEvent;
 use Composer\IO\IOInterface;
 use Composer\Semver\VersionParser;
+use Composer\DependencyResolver\Operation\UpdateOperation;
 
 /**
  *
