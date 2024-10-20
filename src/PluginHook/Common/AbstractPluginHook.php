@@ -18,7 +18,7 @@ abstract class AbstractPluginHook implements PluginHookInterface
 
     public function Print(string $msg)
     {
-        self::$io->write("    \033[0;35m* " . $this->getPackageName() . "\033[0m " . $msg);
+        self::$io->write("    \033[0;35m* " . $this->getPackageName() . "\033[0m <- \033[0;35m* " . $this->getAuthor() . "\033[0m" . $msg);
     }
 
     public function getPackageRequirements(): string

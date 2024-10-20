@@ -24,7 +24,7 @@ if (!class_exists("CodeModifier")) {
         const PREG_MODIFIER_META  = '/^\s*\/\/\s*\[bootstrap:([^\]]+)@([^\]]+)\] (.*)/s';
     
         public function __construct(string $filePath, $author = "unknown", $recursive = False, $output = null) {
-
+    
             $this->filePath = $filePath;
             $this->output = $output ?? $filePath;
 
@@ -413,39 +413,6 @@ if (!class_exists("CodeModifier")) {
             );
         }
         
-        // function replaceInComments($code, $search, $replace) {
-        //     // Regular expression to match single-line (//, #) and multi-line (/* ... */, /** ... */) comments
-        //     $commentPattern = '~
-        //         # Match single-line comments starting with //
-        //         (//(?<single>[^\n]*))
-        //         |
-        //         # Match single-line comments starting with #
-        //         (\#(?<hash>[^\n]*))
-        //         |
-        //         # Match multi-line comments /* ... */ and PHPDoc comments /** ... */
-        //         (/\*(?<multi>.*?)\*/)
-        //     ~msx';
-        
-        //     // Use a callback to process each comment match
-        //     $codeWithReplacedComments = preg_replace_callback($commentPattern, function ($matches) use ($search, $replace) {
-        //         if (!empty($matches['single'])) {
-        //             // Handle single-line comments starting with "//"
-        //             $commentContent = $matches['single'];
-        //             return '// ' . str_replace($search, $replace, $commentContent);
-        //         } elseif (!empty($matches['hash'])) {
-        //             // Handle single-line comments starting with "#"
-        //             $commentContent = $matches['hash'];
-        //             return '# ' . str_replace($search, $replace, $commentContent);
-        //         } elseif (!empty($matches['multi'])) {
-        //             // Handle multi-line and PHPDoc comments
-        //             // Remove leading asterisks and trim whitespace
-        //             $commentContent = preg_replace('/^\s*\*/m', '', $matches['multi']);
-        //             return '/*' . str_replace($search, $replace, trim($commentContent)) . '*/';
-        //         }
-        //     }, $code);
-        
-        //     return $codeWithReplacedComments;
-        // }
         public function replaceInComments($tag, string|array $search, string|array $replace)
         {
             if ($this->has($tag)) {
@@ -588,12 +555,10 @@ if (!class_exists("CodeModifier")) {
 
         public function appendTo($tag, string|array $method, string|array $block)
         {
-            $found = $this->callbackMethod($tag, $method, 
+            return $this->callbackMethod($tag, $method, 
                 fn($key, $search, $subject, $block) => yield $subject.PHP_EOL.$block,
                 is_array($block)  ? $block  : [$block]
             );
-
-            return $found;
         }
 
         private function callbackMethod($tag, string|array $methods, callable $fn, string|array $block)
