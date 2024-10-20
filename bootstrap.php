@@ -24,7 +24,7 @@ if (!class_exists("CodeModifier")) {
         const PREG_MODIFIER_META  = '/^\s*\/\/\s*\[bootstrap:([^\]]+)@([^\]]+)\] (.*)/s';
     
         public function __construct(string $filePath, $author = "unknown", $recursive = False, $output = null) {
-    
+
             $this->filePath = $filePath;
             $this->output = $output ?? $filePath;
 
@@ -178,6 +178,21 @@ if (!class_exists("CodeModifier")) {
     
             return $filteredTokens;
         }
+
+        // Get the current contents of the file
+        public static function reduces($tokens, int|array $filter = []) {
+    
+            $filter = is_array($filter) ? $filter : [$filter];
+            
+            $filteredTokens = [];
+            foreach($tokens as $key => $token) {
+    
+                if(!in_array($token["tag"], $filter)) continue;
+                $filteredTokens[$key] = $token;
+            }  
+    
+            return $filteredTokens;
+        }
     
         // Get changes tracked by the class
         public static function changes($tokens) {
@@ -235,30 +250,45 @@ if (!class_exists("CodeModifier")) {
     
         // Helper method to generate the modification block and save original lines
         protected function generator($tag, $search, $subject, callable $fn, ...$args) {
-    
+            
+            // Collect the yielded content from the generator function
+            $generatedContent = iterator_to_array($fn($tag, $search, $subject, ...$args));
+
+            // If no modification has been made (i.e., the generator yields the same content)
+            if (implode(PHP_EOL, $generatedContent) === $subject) {
+                // No modification, return the original content unchanged
+                return $subject;
+            }
+
+            // Otherwise, prepare to add the bootstrap comments and the modifications
             $date = date('Y-m-d');
             $time = date('H:i:s');
-    
+
+            // Generate a unique commit identifier
             $commit = uniqid();
-            while( $this->commits($tag, $commit) !== null)
+            while ($this->commits($tag, $commit) !== null) {
                 $commit = uniqid();
-    
+            }
+
+            // Initialize the array for the marked content with the modification comment block
             $markedContent = [];
             $markedContent[] = "// [bootstrap:$tag@$commit] ##### This code was automatically updated by `$this->author` on $date at $time";
-    
+
             // Add original lines as comments
             $lines = explode(PHP_EOL, $subject);
             foreach ($lines as $line) {
                 $markedContent[] = "// [bootstrap:$tag@$commit] " . $line;
             }
-    
-            // Add modified lines
-            $generator = $fn($tag, $search, $subject, ...$args) ?? [];
-            foreach ($generator as $line) {
+
+            // Add modified lines from the generator function (collected content)
+            foreach ($generatedContent as $line) {
                 $markedContent[] = $line;
             }
-    
+
+            // End the modification block
             $markedContent[] = "// [bootstrap:$tag@$commit] ##### End of modification";
+
+            // Return the modified content with the bootstrap comments
             return implode(PHP_EOL, $markedContent);
         }
     
@@ -382,6 +412,78 @@ if (!class_exists("CodeModifier")) {
                 is_array($replace) ? $replace : [$replace]
             );
         }
+        
+        // function replaceInComments($code, $search, $replace) {
+        //     // Regular expression to match single-line (//, #) and multi-line (/* ... */, /** ... */) comments
+        //     $commentPattern = '~
+        //         # Match single-line comments starting with //
+        //         (//(?<single>[^\n]*))
+        //         |
+        //         # Match single-line comments starting with #
+        //         (\#(?<hash>[^\n]*))
+        //         |
+        //         # Match multi-line comments /* ... */ and PHPDoc comments /** ... */
+        //         (/\*(?<multi>.*?)\*/)
+        //     ~msx';
+        
+        //     // Use a callback to process each comment match
+        //     $codeWithReplacedComments = preg_replace_callback($commentPattern, function ($matches) use ($search, $replace) {
+        //         if (!empty($matches['single'])) {
+        //             // Handle single-line comments starting with "//"
+        //             $commentContent = $matches['single'];
+        //             return '// ' . str_replace($search, $replace, $commentContent);
+        //         } elseif (!empty($matches['hash'])) {
+        //             // Handle single-line comments starting with "#"
+        //             $commentContent = $matches['hash'];
+        //             return '# ' . str_replace($search, $replace, $commentContent);
+        //         } elseif (!empty($matches['multi'])) {
+        //             // Handle multi-line and PHPDoc comments
+        //             // Remove leading asterisks and trim whitespace
+        //             $commentContent = preg_replace('/^\s*\*/m', '', $matches['multi']);
+        //             return '/*' . str_replace($search, $replace, trim($commentContent)) . '*/';
+        //         }
+        //     }, $code);
+        
+        //     return $codeWithReplacedComments;
+        // }
+        public function replaceInComments($tag, string|array $search, string|array $replace)
+        {
+            if ($this->has($tag)) {
+                return false;
+            }
+    
+            $found = false;
+    
+            $search  = is_array($search)  ? $search  : [$search];
+            foreach ($search as $key => $searchItem) {
+    
+                foreach($this->tokens as &$token) {
+
+                    if(in_array($token["tag"], [T_COMMENT, T_DOC_COMMENT])) {
+                        
+                        $content = $this->generator(
+                            $tag, $searchItem, $token["content"], 
+                            fn($key, $search, $subject, $replace) => yield str_replace($search, $replace[$key] ?? $replace[count($replace) - 1], $subject), 
+                            is_array($replace) ? $replace : [$replace]
+                        );
+
+                        if ($token["content"] != $content) {
+                            $token["content"] = $content;
+                            $found = true;
+                        }
+                    }
+                }
+            }
+    
+            if ($found) {
+
+                $this->backup();  // Backup the initial file before saving
+                $this->write();
+                $this->parse();
+            }
+    
+            return $found;
+        }
     
         protected function callback($tag, string|array $search, callable $fn, ...$args)
         {
@@ -399,27 +501,18 @@ if (!class_exists("CodeModifier")) {
                 do {
     
                     // Clean content to remove comments for matching
-                    if($this->recursive) {
-                        
-                        $tokens = $this->filter($this->tokens, [
-                            self::T_MODIFIER_START, self::T_MODIFIER_END, self::T_MODIFIER_META,
-                            T_COMMENT,T_DOC_COMMENT
-                        ]); 
-    
-                    } else {
-    
-                        $tokens = $this->filter($this->tokens, [
-                            self::T_MODIFIER_START, self::T_MODIFIER_END, self::T_MODIFIER_META, self::T_MODIFIER_BLOCK,
-                            T_COMMENT,T_DOC_COMMENT
-                        ]);           
+                    $tokenTypes = [self::T_MODIFIER_START, self::T_MODIFIER_END, self::T_MODIFIER_META, T_COMMENT, T_DOC_COMMENT];
+                    if (!$this->recursive) {
+                        $tokenTypes[] = self::T_MODIFIER_BLOCK;
                     }
-    
+
+                    $tokens = $this->filter($this->tokens, $tokenTypes);
                     $offset = $this->offset($tokens, $nextToken);
                     $contents = $this->detokenize($tokens);
 
                     // Handle multiline search: allow flexible whitespaces between lines
                     $escapedSearch = preg_quote($searchItem, '/');
-                    $pattern = '/[^'.PHP_EOL.']*'. str_replace(PHP_EOL, '[ ]*' . PHP_EOL . '[ ]*', $escapedSearch) . '[^'.PHP_EOL.']*/s';
+                    $pattern = '/[^'.PHP_EOL.']*'. str_replace(PHP_EOL, '[ \*]*' . PHP_EOL . '[ ]*', $escapedSearch) . '[^'.PHP_EOL.']*/s';
     
                     // Use preg_match_all to find all occurrences in cleaned content
                     if (!preg_match($pattern, $contents, $matches, PREG_OFFSET_CAPTURE, $offset)) {
@@ -436,6 +529,7 @@ if (!class_exists("CodeModifier")) {
                             $firstToken = $this->tell($tokens, $matchStart);
                             $lastToken  = $this->tell($tokens, $matchStart + $matchLength - 1);
                             $matchedBlock = $this->detokenize($this->tokens, $firstToken, $lastToken);
+                            
                             $prefix = "";
                             if (strpos($matchedBlock, PHP_EOL) === 0) {
                                 $matchedBlock = substr($matchedBlock, strlen(PHP_EOL));
@@ -494,10 +588,12 @@ if (!class_exists("CodeModifier")) {
 
         public function appendTo($tag, string|array $method, string|array $block)
         {
-            return $this->callbackMethod($tag, $method, 
+            $found = $this->callbackMethod($tag, $method, 
                 fn($key, $search, $subject, $block) => yield $subject.PHP_EOL.$block,
                 is_array($block)  ? $block  : [$block]
             );
+
+            return $found;
         }
 
         private function callbackMethod($tag, string|array $methods, callable $fn, string|array $block)
