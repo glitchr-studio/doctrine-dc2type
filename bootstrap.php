@@ -441,7 +441,7 @@ if (!class_exists("CodeModifier")) {
                     }
                 }
             }
-    
+
             if ($found) {
 
                 $this->backup();  // Backup the initial file before saving
