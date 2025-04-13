@@ -252,7 +252,8 @@ if (!class_exists("CodeModifier")) {
         protected function generator($tag, $search, $subject, callable $fn, ...$args) {
             
             // Collect the yielded content from the generator function
-            $generatedContent = iterator_to_array($fn($tag, $search, $subject, ...$args));
+            $iterator = $fn($tag, $search, $subject, ...$args);
+            $generatedContent = $iterator ? iterator_to_array($iterator) : [];
 
             // If no modification has been made (i.e., the generator yields the same content)
             if (implode(PHP_EOL, $generatedContent) === $subject) {
