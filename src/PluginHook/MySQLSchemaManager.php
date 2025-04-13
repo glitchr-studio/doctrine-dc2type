@@ -14,6 +14,11 @@ final class MySQLSchemaManager extends Common\AbstractPluginHook
         return 'doctrine/dbal';
     }
 
+    public function getPackageRequirements(): string
+    {
+        return "*";
+    }
+
     public function onPackageChange(PackageEvent $event)
     {
         $search = '$type = $this->platform->getDoctrineTypeMapping($dbType);';
