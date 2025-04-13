@@ -14,6 +14,11 @@ final class AbstractSchemaManager extends Common\AbstractPluginHook
         return 'doctrine/dbal';
     }
 
+    public function getPackageRequirements(): string
+    {
+        return ">=4";
+    }
+
     public function onPackageChange(PackageEvent $event)
     {
         $block = '

@@ -21,11 +21,6 @@ abstract class AbstractPluginHook implements PluginHookInterface
         self::$io->write("    \033[0;35m* " . $this->getPackageName() . " <- " . $this->getAuthor() . "\033[0m " . $msg);
     }
 
-    public function getPackageRequirements(): string
-    {
-        return "*";
-    }
-
     /**
      * @param PackageEvent $event
      * @return mixed
