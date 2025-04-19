@@ -8,6 +8,16 @@ use Composer\Installer\PackageEvent;
 use Composer\IO\IOInterface;
 use Composer\Semver\VersionParser;
 use Composer\DependencyResolver\Operation\UpdateOperation;
+<?php
+
+namespace Base\Composer\PluginHook\Common;
+use Base\Composer\PluginHookInterface;
+
+use Composer\Factory;
+use Composer\Installer\PackageEvent;
+use Composer\IO\IOInterface;
+use Composer\Semver\VersionParser;
+use Composer\DependencyResolver\Operation\UpdateOperation;
 
 /**
  *
@@ -79,7 +89,7 @@ abstract class AbstractPluginHook implements PluginHookInterface
     public function getPackageVersion(PackageEvent $event): string
     {
         $operation = $event->getOperation();
-    
+
         if ($operation instanceof UpdateOperation) {
             return $operation->getTargetPackage()->getVersion();
         }
@@ -112,7 +122,8 @@ abstract class AbstractPluginHook implements PluginHookInterface
 
     protected function getBundlePHPFiles(): iterable
     {
-        foreach (new \RecursiveIteratorIterator(new \RecursiveDirectoryIterator($this->getBundleDir(), \FilesystemIterator::SKIP_DOTS)) as $filePath) {
+        $iterator = new \RecursiveDirectoryIterator($this->getBundleDir(), \FilesystemIterator::SKIP_DOTS);
+        foreach (new \RecursiveIteratorIterator($iterator) as $filePath) {
             if (is_dir($filePath) || !str_ends_with($filePath, '.php')) {
                 continue;
             }
