@@ -8,16 +8,6 @@ use Composer\Installer\PackageEvent;
 use Composer\IO\IOInterface;
 use Composer\Semver\VersionParser;
 use Composer\DependencyResolver\Operation\UpdateOperation;
-<?php
-
-namespace Base\Composer\PluginHook\Common;
-use Base\Composer\PluginHookInterface;
-
-use Composer\Factory;
-use Composer\Installer\PackageEvent;
-use Composer\IO\IOInterface;
-use Composer\Semver\VersionParser;
-use Composer\DependencyResolver\Operation\UpdateOperation;
 
 /**
  *
