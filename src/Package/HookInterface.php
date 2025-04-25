@@ -1,13 +1,13 @@
 <?php
 
-namespace Doctrine\Composer;
+namespace Doctrine\Composer\Package;
 
 use Composer\Installer\PackageEvent;
 
 /**
  *
  */
-interface PluginHookInterface
+interface HookInterface
 {
     public function getPackageName(): string;
     public function getPackageVersion(PackageEvent $event): string;

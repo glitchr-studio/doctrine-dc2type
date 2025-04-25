@@ -1,7 +1,6 @@
 <?php
 
 namespace Doctrine\Composer;
-use Doctrine\Composer\PluginHook\Common\AbstractPluginHook;
 
 use Composer\Autoload\ClassMapGenerator;
 use Composer\Composer;
@@ -11,6 +10,8 @@ use Composer\Installer\PackageEvent;
 use Composer\Installer\PackageEvents;
 use Composer\IO\IOInterface;
 use Composer\Plugin\PluginInterface;
+use Doctrine\Composer\Package\AbstractHook;
+use Doctrine\Composer\Package\HookInterface;
 
 include_once dirname(__FILE__) . '/../bootstrap.php';
 
@@ -41,7 +42,7 @@ final class Plugin implements PluginInterface, EventSubscriberInterface
 
     public function activate(Composer $composer, IOInterface $io)
     {
-        AbstractPluginHook::$io = $io;
+        AbstractHook::$io = $io;
     }
 
     public function deactivate(Composer $composer, IOInterface $io)
@@ -78,7 +79,7 @@ final class Plugin implements PluginInterface, EventSubscriberInterface
 
         foreach (ClassMapGenerator::createMap(__DIR__) as $className => $_) {
 
-            if (!in_array(PluginHookInterface::class, class_implements($className))) {
+            if (!in_array(HookInterface::class, class_implements($className))) {
                 continue;
             }
 
@@ -116,7 +117,7 @@ final class Plugin implements PluginInterface, EventSubscriberInterface
 
         foreach (ClassMapGenerator::createMap(__DIR__) as $className => $_) {
 
-            if (!in_array(PluginHookInterface::class, class_implements($className))) {
+            if (!in_array(HookInterface::class, class_implements($className))) {
                 continue;
             }
 
@@ -155,7 +156,7 @@ final class Plugin implements PluginInterface, EventSubscriberInterface
 
         foreach (ClassMapGenerator::createMap(__DIR__) as $className => $_) {
 
-            if (!in_array(PluginHookInterface::class, class_implements($className))) {
+            if (!in_array(HookInterface::class, class_implements($className))) {
                 continue;
             }
 

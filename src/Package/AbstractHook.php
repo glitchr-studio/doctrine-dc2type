@@ -1,7 +1,6 @@
 <?php
 
-namespace Doctrine\Composer\PluginHook\Common;
-use Doctrine\Composer\PluginHookInterface;
+namespace Doctrine\Composer\Package;
 
 use Composer\Factory;
 use Composer\Installer\PackageEvent;
@@ -12,7 +11,7 @@ use Composer\DependencyResolver\Operation\UpdateOperation;
 /**
  *
  */
-abstract class AbstractPluginHook implements PluginHookInterface
+abstract class AbstractHook implements HookInterface
 {
     public static IOInterface $io;
 

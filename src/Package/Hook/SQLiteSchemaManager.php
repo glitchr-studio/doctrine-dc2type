@@ -1,13 +1,14 @@
 <?php
 
-namespace Doctrine\Composer\PluginHook;
+namespace Doctrine\Composer\Package\Hook;
 
 use Composer\Installer\PackageEvent;
+use Doctrine\Composer\Package\AbstractHook;
 
 /**
  *
  */
-final class MySQLSchemaManager extends Common\AbstractPluginHook
+final class SQLiteSchemaManager extends AbstractHook
 {
     public function getPackageName(): string
     {
@@ -24,8 +25,8 @@ final class MySQLSchemaManager extends Common\AbstractPluginHook
         $search = '$type = $this->platform->getDoctrineTypeMapping($dbType);';
         $block  = '$type = $this->extractDoctrineTypeFromComment($tableColumn[\'comment\'] ?? null, $type);';
         
-        $this->Print('Updating "MySQLSchemaManager.php" file.');
-        $codeModifier = new \CodeModifier($this->getBundleDir() . '/src/Schema/MySQLSchemaManager.php', $this->getAuthor());
+        $this->Print('Updating "SQLiteSchemaManager.php" file.');
+        $codeModifier = new \CodeModifier($this->getBundleDir() . '/src/Schema/SQLiteSchemaManager.php', $this->getAuthor());
         $codeModifier->appendToLine("comment", $search, $block);
     }
 }
