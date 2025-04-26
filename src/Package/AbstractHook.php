@@ -29,9 +29,9 @@ abstract class AbstractHook implements HookInterface
         $shortAuthor = strlen($author) > $displayLimit - 3 ? substr($author, 0, $displayLimit - 5) . '...' : $author;
 
         $prefix = sprintf(
-            "    * Patching \033[0;35m%-".$displayLimit."s via \033[0;33m %-".$displayLimit."s\033[0m.. %s",
-            "\"".$shortPackageName."\"",
-            "\"".$shortAuthor."\"",
+            "    * Patching \033[0;35m%-".$displayLimit."s\033[0;33m via \033[0;35m%-".$displayLimit."s\033[0m.. %s",
+            $shortPackageName,
+            $shortAuthor,
             $msg
         );
 
