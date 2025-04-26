@@ -26,7 +26,7 @@ final class PostgreSQLSchemaManager extends AbstractHook
         $search = '$type = $this->platform->getDoctrineTypeMapping($dbType);';
         $block  = '$type = $this->extractDoctrineTypeFromComment($tableColumn[\'comment\'] ?? null, $type);';
         
-        $this->Print('Updating "PostgreSQLSchemaManager.php" file.');
+        $this->print('Updating "PostgreSQLSchemaManager.php" file.');
         $codeModifier = new CodeModifier($this->getBundleDir() . '/src/Schema/PostgreSQLSchemaManager.php', $this->getAuthor());
         $codeModifier->appendToLine("comment", $search, $block);
     }

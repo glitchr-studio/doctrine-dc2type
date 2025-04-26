@@ -38,9 +38,10 @@ final class Plugin implements PluginInterface, EventSubscriberInterface
         ];
     }
 
+    protected IOInterface $io;
     public function activate(Composer $composer, IOInterface $io)
     {
-        AbstractHook::$io = $io;
+        $this->io = $io;
     }
 
     public function deactivate(Composer $composer, IOInterface $io)
@@ -82,7 +83,7 @@ final class Plugin implements PluginInterface, EventSubscriberInterface
             }
 
             try {
-                $class = new $className();
+                $class = new $className($this->io);
             } catch (\Error $e) {
                 continue;
             }
@@ -120,7 +121,7 @@ final class Plugin implements PluginInterface, EventSubscriberInterface
             }
 
             try {
-                $class = new $className();
+                $class = new $className($this->io);
             } catch (\Error $e) {
                 continue;
             }
@@ -159,7 +160,7 @@ final class Plugin implements PluginInterface, EventSubscriberInterface
             }
 
             try {
-                $class = new $className();
+                $class = new $className($this->io);
             } catch (\Error $e) {
                 continue;
             }

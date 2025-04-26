@@ -39,7 +39,7 @@ public function extractDoctrineTypeFromComment(?string $comment, string $current
     return $currentType;
 }';
 
-        $this->Print('Updating "AbstractSchemaManager.php" file.');
+        $this->print('Updating "AbstractSchemaManager.php" file.');
         $codeModifier = new CodeModifier($this->getBundleDir() . '/src/Schema/AbstractSchemaManager.php', $this->getAuthor());
         $codeModifier->appendTo("comment", "\Doctrine\DBAL\Schema\AbstractSchemaManager::listTableIndexes", $block);
     }
