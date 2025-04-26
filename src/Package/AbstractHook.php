@@ -13,8 +13,7 @@ use Composer\DependencyResolver\Operation\UpdateOperation;
  */
 abstract class AbstractHook implements HookInterface
 {
-    public static IOInterface $io;
-
+    public IOInterface $io;
     public function __construct(IOInterface $io)
     {
         $this->io = $io;
