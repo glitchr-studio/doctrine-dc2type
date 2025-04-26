@@ -4,6 +4,7 @@ namespace Doctrine\Composer\Package\Hook;
 
 use Composer\Installer\PackageEvent;
 use Doctrine\Composer\Package\AbstractHook;
+use Doctrine\Composer\CodeModifier;
 
 /**
  *
@@ -26,7 +27,7 @@ final class SQLiteSchemaManager extends AbstractHook
         $block  = '$type = $this->extractDoctrineTypeFromComment($tableColumn[\'comment\'] ?? null, $type);';
         
         $this->Print('Updating "SQLiteSchemaManager.php" file.');
-        $codeModifier = new \CodeModifier($this->getBundleDir() . '/src/Schema/SQLiteSchemaManager.php', $this->getAuthor());
+        $codeModifier = new CodeModifier($this->getBundleDir() . '/src/Schema/SQLiteSchemaManager.php', $this->getAuthor());
         $codeModifier->appendToLine("comment", $search, $block);
     }
 }

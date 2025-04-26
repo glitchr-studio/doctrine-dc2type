@@ -4,6 +4,7 @@ namespace Doctrine\Composer\Package\Hook;
 
 use Composer\Installer\PackageEvent;
 use Doctrine\Composer\Package\AbstractHook;
+use Doctrine\Composer\CodeModifier;
 
 /**
  *
@@ -39,7 +40,7 @@ public function extractDoctrineTypeFromComment(?string $comment, string $current
 }';
 
         $this->Print('Updating "AbstractSchemaManager.php" file.');
-        $codeModifier = new \CodeModifier($this->getBundleDir() . '/src/Schema/AbstractSchemaManager.php', $this->getAuthor());
+        $codeModifier = new CodeModifier($this->getBundleDir() . '/src/Schema/AbstractSchemaManager.php', $this->getAuthor());
         $codeModifier->appendTo("comment", "\Doctrine\DBAL\Schema\AbstractSchemaManager::listTableIndexes", $block);
     }
 }

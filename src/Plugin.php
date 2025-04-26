@@ -13,8 +13,6 @@ use Composer\Plugin\PluginInterface;
 use Doctrine\Composer\Package\AbstractHook;
 use Doctrine\Composer\Package\HookInterface;
 
-include_once dirname(__FILE__) . '/../bootstrap.php';
-
 /**
  *
  */

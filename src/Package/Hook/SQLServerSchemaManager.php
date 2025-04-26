@@ -4,6 +4,7 @@ namespace Doctrine\Composer\Package\Hook;
 
 use Composer\Installer\PackageEvent;
 use Doctrine\Composer\Package\AbstractHook;
+use Doctrine\Composer\CodeModifier;
 
 /**
  *
@@ -26,7 +27,7 @@ final class SQLServerSchemaManager extends AbstractHook
         $block  = '$type = $this->extractDoctrineTypeFromComment($tableColumn[\'comment\'] ?? null, $type);';
         
         $this->Print('Updating "SQLServerSchemaManager.php" file.');
-        $codeModifier = new \CodeModifier($this->getBundleDir() . '/src/Schema/SQLServerSchemaManager.php', $this->getAuthor());
+        $codeModifier = new CodeModifier($this->getBundleDir() . '/src/Schema/SQLServerSchemaManager.php', $this->getAuthor());
         $codeModifier->appendToLine("comment", $search, $block);
     }
 }
