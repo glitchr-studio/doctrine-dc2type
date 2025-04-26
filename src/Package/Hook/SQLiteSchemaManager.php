@@ -25,9 +25,9 @@ final class SQLiteSchemaManager extends AbstractHook
     {
         $search = '$type = $this->platform->getDoctrineTypeMapping($dbType);';
         $block  = '$type = $this->extractDoctrineTypeFromComment($tableColumn[\'comment\'] ?? null, $type);';
-        
-        $this->print('Updating "SQLiteSchemaManager.php" file.');
+
+        $this->print('Reintroducing comments in `SQLiteSchemaManager.php`.');
         $codeModifier = new CodeModifier($this->getBundleDir() . '/src/Schema/SQLiteSchemaManager.php', $this->getAuthor());
-        $codeModifier->appendToLine("comment", $search, $block);
+        $codeModifier->appendToLine("extractDoctrineComments", $search, $block);
     }
 }

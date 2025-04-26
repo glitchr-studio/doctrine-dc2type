@@ -26,8 +26,8 @@ final class OracleSchemaManager extends AbstractHook
         $search = '$type = $this->platform->getDoctrineTypeMapping($dbType);';
         $block  = '$type = $this->extractDoctrineTypeFromComment($tableColumn[\'comment\'] ?? null, $type);';
         
-        $this->print('Updating "OracleSchemaManager.php" file.');
+        $this->print('Reintroducing comments in `OracleSchemaManager.php`.');
         $codeModifier = new CodeModifier($this->getBundleDir() . '/src/Schema/OracleSchemaManager.php', $this->getAuthor());
-        $codeModifier->appendToLine("comment", $search, $block);
+        $codeModifier->appendToLine("extractDoctrineComments", $search, $block);
     }
 }

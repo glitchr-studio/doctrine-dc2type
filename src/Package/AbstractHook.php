@@ -21,8 +21,23 @@ abstract class AbstractHook implements HookInterface
 
     public function print(string $msg)
     {
-        $this->io->write("    \033[0;35m* " . $this->getPackageName() . " <- " . $this->getAuthor() . "\033[0m " . $msg);
+        $packageName = $this->getPackageName();
+        $author = $this->getAuthor();
+
+        $displayLimit = 25;
+        $shortPackageName = strlen($packageName) > $displayLimit - 3 ? substr($packageName, 0, $displayLimit - 5) . '...' : $packageName;
+        $shortAuthor = strlen($author) > $displayLimit - 3 ? substr($author, 0, $displayLimit - 5) . '...' : $author;
+
+        $prefix = sprintf(
+            "    * Patching \033[0;35m%-".$displayLimit."s via \033[0;33m %-".$displayLimit."s\033[0m.. %s",
+            "\"".$shortPackageName."\"",
+            "\"".$shortAuthor."\"",
+            $msg
+        );
+
+        $this->io->write($prefix);
     }
+
 
     /**
      * @param PackageEvent $event
@@ -92,7 +107,7 @@ abstract class AbstractHook implements HookInterface
 
     protected function getAuthor(): string
     {
-        return basename(dirname(__FILE__, 5))."/".basename(dirname(__FILE__, 4));
+        return basename(dirname(__FILE__, 4))."/".basename(dirname(__FILE__, 3));
     }
     
     protected function getProjectDir(): string

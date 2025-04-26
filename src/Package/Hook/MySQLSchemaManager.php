@@ -25,9 +25,9 @@ final class MySQLSchemaManager extends AbstractHook
     {
         $search = '$type = $this->platform->getDoctrineTypeMapping($dbType);';
         $block  = '$type = $this->extractDoctrineTypeFromComment($tableColumn[\'comment\'] ?? null, $type);';
-        
-        $this->print('Updating "MySQLSchemaManager.php" file.');
+
+        $this->print('Reintroducing comments in `MySQLSchemaManager.php`.');
         $codeModifier = new CodeModifier($this->getBundleDir() . '/src/Schema/MySQLSchemaManager.php', $this->getAuthor());
-        $codeModifier->appendToLine("comment", $search, $block);
+        $codeModifier->appendToLine("extractDoctrineComments", $search, $block);
     }
 }
