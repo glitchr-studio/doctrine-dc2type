@@ -8,9 +8,6 @@ use Composer\IO\IOInterface;
 use Composer\Semver\VersionParser;
 use Composer\DependencyResolver\Operation\UpdateOperation;
 
-/**
- *
- */
 abstract class AbstractHook implements HookInterface
 {
     public IOInterface $io;

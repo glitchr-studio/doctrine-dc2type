@@ -6,9 +6,6 @@ use Composer\Installer\PackageEvent;
 use Doctrine\Composer\Package\AbstractHook;
 use Doctrine\Composer\CodeModifier;
 
-/**
- *
- */
 final class MySQLSchemaManager extends AbstractHook
 {
     public function getPackageName(): string

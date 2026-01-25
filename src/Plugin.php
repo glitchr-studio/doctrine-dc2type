@@ -13,9 +13,6 @@ use Composer\Plugin\PluginInterface;
 use Doctrine\Composer\Package\AbstractHook;
 use Doctrine\Composer\Package\HookInterface;
 
-/**
- *
- */
 final class Plugin implements PluginInterface, EventSubscriberInterface
 {
     /**
