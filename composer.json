@@ -16,17 +16,26 @@
     "composer-plugin-api": "^2.0"
   },
   "require-dev": {
-    "composer/composer": "^2.0"
+    "composer/composer": "^2.0",
+    "phpunit/phpunit": "^9.5|^10.0"
   },
   "autoload": {
     "psr-4": {
       "Doctrine\\Composer\\": "src"
     }
   },
+  "autoload-dev": {
+    "psr-4": {
+      "Doctrine\\Composer\\Tests\\": "tests"
+    }
+  },
   "config": {
     "platform": { "php": "8.0" },
     "preferred-install": { "*": "dist" },
     "sort-packages": true
+  },
+  "scripts": {
+    "test": "phpunit"
   },
   "extra": {
     "class": "Doctrine\\Composer\\Plugin"

@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Kept compatible with both PHPUnit 10 (CI) and 9.6 (host app simple-phpunit
+     bridge). tests/bootstrap.php self-registers the test namespace so the suite
+     runs whether the package is installed standalone or inside a host app. -->
+<phpunit xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         bootstrap="tests/bootstrap.php"
+         colors="true">
+    <testsuites>
+        <testsuite name="unit">
+            <directory>tests</directory>
+        </testsuite>
+    </testsuites>
+    <source>
+        <include>
+            <directory>src</directory>
+        </include>
+    </source>
+</phpunit>

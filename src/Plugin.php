@@ -10,11 +10,30 @@ use Composer\Installer\PackageEvent;
 use Composer\Installer\PackageEvents;
 use Composer\IO\IOInterface;
 use Composer\Plugin\PluginInterface;
+use Doctrine\Composer\Exception\CodeModifierException;
 use Doctrine\Composer\Package\AbstractHook;
 use Doctrine\Composer\Package\HookInterface;
 
 final class Plugin implements PluginInterface, EventSubscriberInterface
 {
+    /**
+     * Runs a hook and, if its patch could not be applied (target source
+     * drifted), surfaces the failure loudly instead of letting it pass
+     * unnoticed. Re-thrown so the composer command itself fails — this
+     * restoration is not optional, and a silent miss (the historical
+     * SQLiteSchemaManager bug) must never happen again.
+     */
+    private function runHook(callable $run): void
+    {
+        try {
+            $run();
+        } catch (CodeModifierException $e) {
+            $this->io->writeError('<error>[doctrine-dc2type] DC2Type comment restoration FAILED:</error>');
+            $this->io->writeError('<error>' . $e->getMessage() . '</error>');
+            throw $e;
+        }
+    }
+
     /**
      * @return string
      */
@@ -95,7 +114,7 @@ final class Plugin implements PluginInterface, EventSubscriberInterface
                 continue;
             }
 
-            $class->onPackageInstall($event);
+            $this->runHook(fn() => $class->onPackageInstall($event));
         }
     }
 
@@ -134,7 +153,7 @@ final class Plugin implements PluginInterface, EventSubscriberInterface
                 continue;
             }
 
-            $class->onPackageUpdate($event);
+            $this->runHook(fn() => $class->onPackageUpdate($event));
         }
     }
 
@@ -172,7 +191,7 @@ final class Plugin implements PluginInterface, EventSubscriberInterface
                 continue;
             }
 
-            $class->onPackageRemove($event);
+            $this->runHook(fn() => $class->onPackageRemove($event));
         }
     }
 }

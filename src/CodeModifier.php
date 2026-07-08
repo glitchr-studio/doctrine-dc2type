@@ -2,6 +2,8 @@
 
 namespace Doctrine\Composer;
 
+use Doctrine\Composer\Exception\CodeModifierException;
+
 class CodeModifier {
 
     protected $filePath;
@@ -209,7 +211,10 @@ class CodeModifier {
                     
                     $changes[$tag] ??= [];
                     if(in_array($commit, $changes[$tag])) {
-                        throw new Exception("Duplicate change '$tag@$commit' already exists.");
+                        // Bare `Exception` here resolved to the nonexistent
+                        // Doctrine\Composer\Exception (this namespace), i.e. a
+                        // "class not found" fatal instead of a clean throw.
+                        throw new \RuntimeException("Duplicate change '$tag@$commit' already exists.");
                     }
 
                     $changes[$tag][] = $commit;
@@ -478,9 +483,19 @@ class CodeModifier {
                 $offset = $this->offset($tokens, $nextToken);
                 $contents = $this->detokenize($tokens);
 
-                // Handle multiline search: allow flexible whitespaces between lines
+                // Handle multiline search: allow flexible whitespaces between
+                // lines AND *within* a line — otherwise a single-space search
+                // ("$type = ...") fails to match aligned upstream source
+                // ("$type    = ..."), which is exactly why the SQLite hook
+                // silently missed Doctrine DBAL 4.x. Runs of horizontal
+                // whitespace in the search are tokenized before quoting and
+                // turned into [ \t]+ after, so the [ ]* injected for line
+                // breaks below is left untouched.
                 $escapedSearch = preg_quote($searchItem, '/');
-                $pattern = '/[^'.PHP_EOL.']*'. str_replace(PHP_EOL, '[ \*]*' . PHP_EOL . '[ ]*', $escapedSearch) . '[^'.PHP_EOL.']*/s';
+                $escapedSearch = preg_replace('/[ \t]+/', "\x00WS\x00", $escapedSearch);
+                $escapedSearch = str_replace(PHP_EOL, '[ \*]*' . PHP_EOL . '[ ]*', $escapedSearch);
+                $escapedSearch = str_replace("\x00WS\x00", '[ \t]+', $escapedSearch);
+                $pattern = '/[^'.PHP_EOL.']*'. $escapedSearch . '[^'.PHP_EOL.']*/s';
 
                 // Use preg_match_all to find all occurrences in cleaned content
                 if (!preg_match($pattern, $contents, $matches, PREG_OFFSET_CAPTURE, $offset)) {
@@ -531,6 +546,13 @@ class CodeModifier {
             $this->backup();  // Backup the initial file before saving
             $this->write();
             $this->parse();
+        } else {
+
+            // Not already applied (we'd have returned early on has($tag)) and
+            // nothing matched: the target source has drifted. Fail loudly
+            // rather than silently returning false and letting the caller
+            // print "success" — this is exactly the SQLite silent-miss.
+            throw CodeModifierException::targetNotFound($this->filePath, $tag, is_array($search) ? implode(PHP_EOL, $search) : $search);
         }
 
         return $found;
@@ -538,7 +560,13 @@ class CodeModifier {
 
     public function prependToLine($tag, string|array $search, string|array $block)
     {
-        return $this->replace($tag, $search, $block.PHP_EOL.$search);
+        // Prepend $block before the actually-matched line. The old
+        // replace($tag, $search, $block.PHP_EOL.$search) str_replaced the
+        // ORIGINAL search text inside the matched block, so it silently did
+        // nothing whenever the source's whitespace differed from the search
+        // (e.g. aligned "$type    =" vs single-space "$type =").
+        // prepend() already appends relative to the real matched $subject.
+        return $this->prepend($tag, $search, $block);
     }
 
     public function prependTo($tag, string|array $method, string|array $block)
@@ -551,7 +579,11 @@ class CodeModifier {
 
     public function appendToLine($tag, string|array $search, string|array $block)
     {
-        return $this->replace($tag, $search, $search.PHP_EOL.$block);
+        // Append $block after the actually-matched line — see prependToLine
+        // for why str_replace($search, …) silently no-op'd on whitespace-
+        // variant source (the SQLite alignment bug). append() appends
+        // relative to the real matched $subject.
+        return $this->append($tag, $search, $block);
     }
 
     public function appendTo($tag, string|array $method, string|array $block)
@@ -564,6 +596,12 @@ class CodeModifier {
 
     private function callbackMethod($tag, string|array $methods, callable $fn, string|array $block)
     {
+        // Idempotent: an already-applied patch is a quiet no-op, same as
+        // callback(). Without this a re-install would append the block twice.
+        if ($this->has($tag)) {
+            return 0;
+        }
+
         $found = 0;
         $methods  = is_array($methods)  ? $methods  : [$methods];
         foreach($methods as $methodId=> $method) {
@@ -595,6 +633,12 @@ class CodeModifier {
 
                 $found++;
             }
+        }
+
+        if ($found === 0) {
+            // No target method matched — fail loudly rather than silently
+            // returning 0 (same rationale as callback()).
+            throw CodeModifierException::targetNotFound($this->filePath, $tag, is_array($methods) ? implode(", ", $methods) : $methods);
         }
 
         return $found;
