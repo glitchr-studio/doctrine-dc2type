@@ -2,14 +2,18 @@
   "name": "glitchr/doctrine-dc2type",
   "type": "composer-plugin",
   "description": "Plugin re-enabling DC2Type comments in Doctrine DBAL",
-  "keywords": ["symfony", "doctrine", "dc2type"],
-  "homepage": "https://gitlab.glitchr.dev/public-repository/symfony",
+  "keywords": [
+    "symfony",
+    "doctrine",
+    "dc2type"
+  ],
+  "homepage": "https://github.com/glitchr-studio/doctrine-dc2type",
   "license": "LGPL-3.0-or-later",
   "authors": [
-      {
-          "name": "Marco Meyer",
-          "email": "marco.meyer@glitchr.io"
-      }
+    {
+      "name": "Marco Meyer",
+      "email": "marco.meyer@glitchr.io"
+    }
   ],
   "require": {
     "php": "^8.0",
@@ -30,8 +34,12 @@
     }
   },
   "config": {
-    "platform": { "php": "8.0" },
-    "preferred-install": { "*": "dist" },
+    "platform": {
+      "php": "8.0"
+    },
+    "preferred-install": {
+      "*": "dist"
+    },
     "sort-packages": true
   },
   "scripts": {
